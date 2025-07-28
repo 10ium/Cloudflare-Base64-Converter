@@ -133,7 +133,7 @@
 
         <!-- Path Input Field -->
         <div class="mb-6">
-            <label for="pathInput" class="block text-gray-700 text-right text-sm font-medium mb-2">مسیر دلخواه (مثال: my-content):</label>
+            <label for="pathInput" class="block text-gray-700 text-right text-sm font-medium mb-2">نام فایل خروجی / مسیر URL:</label>
             <input type="text" id="pathInput" value="output"
                    class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
                    placeholder="مثال: my-content یا subfolder/data">
@@ -165,11 +165,24 @@
         </div>
 
         <div id="resultArea" class="mt-8 p-4 bg-gray-100 border border-gray-200 rounded-xl hidden">
-            <p class="text-gray-700 text-right mb-2">لینک نتیجه / محتوای تبدیل شده:</p>
-            <a id="resultLink" href="#" target="_blank" class="result-area text-indigo-600 hover:underline"></a>
+            <!-- Link Result Display -->
+            <div id="linkResultContainer" class="mb-4 hidden">
+                <p class="text-gray-700 text-right mb-2">لینک قابل اشتراک‌گذاری:</p>
+                <a id="resultLink" href="#" target="_blank" class="result-area text-indigo-600 hover:underline"></a>
+            </div>
+
+            <!-- Converted Content Display -->
+            <div id="contentResultContainer" class="mb-4">
+                <p class="text-gray-700 text-right mb-2">محتوای تبدیل شده:</p>
+                <pre id="convertedContentDisplay" class="result-area text-gray-800 text-sm p-2 rounded-lg bg-gray-50"></pre>
+            </div>
+            
             <div class="flex flex-col md:flex-row justify-center gap-4 mt-4">
-                <button id="copyButton" class="bg-indigo-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2">
-                    کپی لینک/نتیجه
+                <button id="copyLinkButton" class="bg-indigo-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2">
+                    کپی لینک
+                </button>
+                <button id="copyContentButton" class="bg-indigo-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2">
+                    کپی محتوا
                 </button>
                 <button id="downloadButton" class="bg-green-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
                     دانلود فایل
@@ -204,8 +217,13 @@
             const processButton = document.getElementById('processButton');
             const loadingMessage = document.getElementById('loadingMessage');
             const resultArea = document.getElementById('resultArea');
-            const resultLink = document.getElementById('resultLink'); 
-            const copyButton = document.getElementById('copyButton');
+            
+            const linkResultContainer = document.getElementById('linkResultContainer'); // New container for link
+            const resultLink = document.getElementById('resultLink'); // For the shareable URL
+            const convertedContentDisplay = document.getElementById('convertedContentDisplay'); // For the actual content
+
+            const copyLinkButton = document.getElementById('copyLinkButton'); // New copy button for link
+            const copyContentButton = document.getElementById('copyContentButton'); // New copy button for content
             const downloadButton = document.getElementById('downloadButton'); 
             const copyMessage = document.getElementById('copyMessage');
             const errorMessage = document.getElementById('errorMessage');
@@ -283,14 +301,13 @@
                         errorText.textContent = 'لطفاً یک لینک معتبر وارد کنید.';
                         isValidInput = false;
                     }
-                    if (!userPath) { // Default path for links if not provided
-                        userPath = 'output'; // Default path for links
+                    if (!userPath) { 
+                        userPath = 'output'; 
                         pathInput.value = userPath; 
                     }
-                    if (userPath.startsWith('/')) { // Remove leading slash for URL construction
+                    if (userPath.startsWith('/')) { 
                         userPath = userPath.substring(1);
                     }
-                    // For links, the download filename will be derived by the Worker
                     finalDownloadFilename = userPath.split('/').pop(); 
                 } else if (selectedInputType === 'text') {
                     contentToProcess = textInput.value;
@@ -298,7 +315,7 @@
                         errorText.textContent = 'لطفاً متنی را وارد کنید.';
                         isValidInput = false;
                     }
-                    if (!userPath) { // Default filename for text if not provided
+                    if (!userPath) { 
                         userPath = 'output.txt';
                         pathInput.value = userPath; 
                     }
@@ -316,7 +333,7 @@
                             errorText.textContent = 'خطا در خواندن فایل: ' + err.message;
                             isValidInput = false;
                         }
-                        if (!userPath) { // Default filename for file if not provided
+                        if (!userPath) { 
                             userPath = file.name || 'output.bin';
                             pathInput.value = userPath; 
                         }
@@ -330,9 +347,9 @@
                     return;
                 }
 
-                let displayContent = '';
+                let shareableLink = '';
+                let displayedContent = '';
                 let downloadHref = '#';
-                let isLinkOutput = false; 
 
                 try {
                     // All processing is now done by the Worker
@@ -340,12 +357,12 @@
                         inputType: selectedInputType,
                         content: selectedInputType === 'file' ? arrayBufferToBase64(contentToProcess) : contentToProcess,
                         operation: selectedOperation,
-                        path: userPath, // Send path to worker for filename suggestion
-                        mimeType: mimeType // Send MIME type for file handling
+                        path: userPath, 
+                        mimeType: mimeType 
                     };
 
                     const workerResponse = await fetch(workerBaseUrl, {
-                        method: 'POST', // Use POST to send potentially large content
+                        method: 'POST', 
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -358,24 +375,41 @@
                     }
 
                     const resultJson = await workerResponse.json();
-                    if (resultJson.url) {
-                        displayContent = resultJson.url; // The worker returns the URL to the processed content
-                        downloadHref = `${resultJson.url}&download=true`; // Add download flag for the download button
-                        isLinkOutput = true;
-                    } else if (resultJson.content) { // Worker might return content directly for text/file
-                        displayContent = resultJson.content;
-                        // For direct content, create a data URL for download
-                        downloadHref = `data:${resultJson.mimeType || 'application/octet-stream'};base64,${btoa(unescape(encodeURIComponent(resultJson.content)))}`;
-                        isLinkOutput = false;
-                    } else {
-                        throw new Error('پاسخ نامعتبر از ورکر.');
+                    
+                    if (selectedInputType === 'link') {
+                        // For links, the worker returns a URL to itself
+                        if (resultJson.url) {
+                            shareableLink = resultJson.url;
+                            // Now fetch the actual content from this shareable link to display it
+                            const contentFetchResponse = await fetch(shareableLink);
+                            if (!contentFetchResponse.ok) {
+                                throw new Error(`خطا در دریافت محتوا از لینک: ${contentFetchResponse.status} - ${await contentFetchResponse.text()}`);
+                            }
+                            displayedContent = await contentFetchResponse.text();
+                            downloadHref = `${shareableLink}&download=true`; // Add download flag for the download button
+                        } else {
+                            throw new Error('پاسخ نامعتبر از ورکر برای لینک.');
+                        }
+                    } else { // Text or File input
+                        // For text/file, the worker returns the processed content directly
+                        if (resultJson.content) {
+                            displayedContent = resultJson.content;
+                            shareableLink = '#'; // No shareable link for direct content
+                            downloadHref = `data:${resultJson.mimeType || 'application/octet-stream'};base64,${btoa(unescape(encodeURIComponent(resultJson.content)))}`;
+                        } else {
+                            throw new Error('پاسخ نامعتبر از ورکر برای متن/فایل.');
+                        }
                     }
 
                     // Update result display
-                    resultLink.textContent = displayContent;
-                    resultLink.href = isLinkOutput ? displayContent : '#'; 
-                    resultLink.style.textDecoration = isLinkOutput ? 'underline' : 'none';
-                    resultLink.style.color = isLinkOutput ? 'rgb(79, 70, 229)' : 'inherit';
+                    if (selectedInputType === 'link') {
+                        linkResultContainer.classList.remove('hidden');
+                        resultLink.textContent = shareableLink;
+                        resultLink.href = shareableLink;
+                    } else {
+                        linkResultContainer.classList.add('hidden');
+                    }
+                    convertedContentDisplay.textContent = displayedContent;
                     
                     // Update download button
                     downloadButton.href = downloadHref;
@@ -411,7 +445,8 @@
                 return btoa(binary);
             }
 
-            copyButton.addEventListener('click', () => {
+            // Copy Link Button
+            copyLinkButton.addEventListener('click', () => {
                 const textToCopy = resultLink.textContent; 
                 const tempInput = document.createElement('textarea');
                 tempInput.value = textToCopy;
@@ -419,11 +454,33 @@
                 tempInput.select();
                 try {
                     document.execCommand('copy');
+                    copyMessage.textContent = 'لینک کپی شد!';
                     copyMessage.classList.remove('hidden');
                     setTimeout(() => copyMessage.classList.add('hidden'), 2000); 
                 } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                    errorText.textContent = 'خطا در کپی کردن نتیجه.';
+                    console.error('Failed to copy link: ', err);
+                    errorText.textContent = 'خطا در کپی کردن لینک.';
+                    errorMessage.classList.remove('hidden');
+                } finally {
+                    document.body.removeChild(tempInput);
+                }
+            });
+
+            // Copy Content Button
+            copyContentButton.addEventListener('click', () => {
+                const textToCopy = convertedContentDisplay.textContent; 
+                const tempInput = document.createElement('textarea');
+                tempInput.value = textToCopy;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                try {
+                    document.execCommand('copy');
+                    copyMessage.textContent = 'محتوا کپی شد!';
+                    copyMessage.classList.remove('hidden');
+                    setTimeout(() => copyMessage.classList.add('hidden'), 2000); 
+                } catch (err) {
+                    console.error('Failed to copy content: ', err);
+                    errorText.textContent = 'خطا در کپی کردن محتوا.';
                     errorMessage.classList.remove('hidden');
                 } finally {
                     document.body.removeChild(tempInput);
