@@ -1,0 +1,28 @@
+# wrangler.toml
+# This file configures your Cloudflare Pages project and its associated Worker.
+
+name = "base64-converter-ui" # نام پروژه Cloudflare Pages شما
+compatibility_date = "2024-07-28" # تاریخ سازگاری (می‌توانید به تاریخ امروز تغییر دهید)
+
+# Pages Build Configuration
+# Cloudflare Pages will automatically detect that your static assets are in the 'public' directory.
+# No specific build command or output directory needed here for a simple static site.
+
+# Worker Binding Configuration
+# This section tells Cloudflare Pages to deploy a Worker from a sub-directory
+# and how to route traffic from your Pages domain to that Worker.
+
+[[pages_build_output.routes]]
+# This pattern defines which URLs on your Pages domain will be handled by the Worker.
+# `*` matches any subdomain or path prefix.
+# `/api/process-link*` means any path starting with /api/process-link
+pattern = "/api/process-link/*"
+# `target` specifies the name of the Worker service to route to.
+# This name must match the `[workers.<worker_name>]` section below.
+target = "base64-processor" # نام ورکر شما که در بخش [workers] تعریف شده است
+
+# Worker Project Definition
+# This section defines the Worker service that will be deployed alongside your Pages project.
+[workers.base64-processor] # نام ورکر شما. باید با 'target' در بالا یکسان باشد.
+main = "worker/index.js" # مسیر فایل اصلی کد ورکر شما نسبت به ریشه مخزن
+compatibility_date = "2024-07-28" # تاریخ سازگاری برای ورکر (می‌توانید به تاریخ امروز تغییر دهید)
