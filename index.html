@@ -11,52 +11,52 @@
     <!-- Google Fonts - Vazirmatn -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Base styles for light mode */
+        /* Base styles for light mode (more vibrant) */
         :root {
-            --bg-color: #f0f2f5;
+            --bg-color: #f8f8ff; /* Ghost White */
             --container-bg: #ffffff;
-            --text-color-primary: #1f2937; /* gray-900 */
-            --text-color-secondary: #4b5563; /* gray-600 */
-            --border-color: #e2e8f0;
-            --input-bg: #f8fafc;
-            --input-border-focus: #6366f1; /* indigo-500 */
-            --button-primary-bg: #6366f1; /* indigo-600 */
-            --button-primary-hover: #4f46e5; /* indigo-700 */
-            --button-secondary-bg: #4ade80; /* green-400 */
-            --button-secondary-hover: #22c55e; /* green-500 */
-            --blue-highlight-bg: #e0e7ff; /* indigo-100 */
-            --blue-highlight-border: #818cf8; /* indigo-400 */
-            --blue-highlight-text: #3730a3; /* indigo-900 */
-            --error-bg: #fee2e2; /* red-100 */
-            --error-text: #ef4444; /* red-500 */
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --shadow-color-light: rgba(0, 0, 0, 0.06);
-            --gradient-start: #6366f1; /* indigo-600 */
-            --gradient-end: #8b5cf6; /* violet-500 */
+            --text-color-primary: #333333;
+            --text-color-secondary: #666666;
+            --border-color: #d1d5db; /* Light gray */
+            --input-bg: #f9fafb; /* Lighter gray */
+            --input-border-focus: #4a90e2; /* Light blue */
+            --button-primary-bg: #3f51b5; /* Indigo */
+            --button-primary-hover: #303f9f; /* Darker Indigo */
+            --button-secondary-bg: #4ade80; /* Green */
+            --button-secondary-hover: #22c55e; /* Darker Green */
+            --blue-highlight-bg: #e3f2fd; /* Light Blue */
+            --blue-highlight-border: #90caf9; /* Medium Blue */
+            --blue-highlight-text: #1a237e; /* Dark Blue */
+            --error-bg: #fee2e2; /* Red-100 */
+            --error-text: #ef4444; /* Red-500 */
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --shadow-color-light: rgba(0, 0, 0, 0.08);
+            --gradient-start: #4a90e2; /* Light blue */
+            --gradient-end: #3f51b5; /* Indigo */
         }
 
-        /* Dark mode styles */
+        /* Dark mode styles (futuristic/neon) */
         [data-theme='dark'] {
-            --bg-color: #1a202c; /* Dark blue-gray */
-            --container-bg: #2d3748; /* Darker blue-gray */
-            --text-color-primary: #e2e8f0; /* light gray */
-            --text-color-secondary: #a0aec0; /* gray-400 */
-            --border-color: #4a5568;
-            --input-bg: #4a5568;
-            --input-border-focus: #a78bfa; /* violet-400 */
-            --button-primary-bg: #7c3aed; /* violet-600 */
-            --button-primary-hover: #6d28d9; /* violet-700 */
-            --button-secondary-bg: #22c55e; /* green-500 */
-            --button-secondary-hover: #16a34a; /* green-600 */
-            --blue-highlight-bg: #4338ca; /* indigo-800 */
-            --blue-highlight-border: #6366f1; /* indigo-600 */
-            --blue-highlight-text: #e0e7ff; /* indigo-100 */
-            --error-bg: #ef4444; /* red-500 */
-            --error-text: #fee2e2; /* red-100 */
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --shadow-color-light: rgba(0, 0, 0, 0.2);
-            --gradient-start: #4c1d95; /* purple-800 */
-            --gradient-end: #6d28d9; /* violet-700 */
+            --bg-color: #0a0a1a; /* Very deep blue/purple */
+            --container-bg: #1a1a3a; /* Darker blue-gray */
+            --text-color-primary: #e0e0f0; /* Bright white/light gray */
+            --text-color-secondary: #a0a0c0; /* Gray-400 */
+            --border-color: #404060; /* Darker border */
+            --input-bg: #2a2a4a; /* Darker, integrated input */
+            --input-border-focus: #a720e0; /* Vibrant purple/magenta */
+            --button-primary-bg: #6a00a8; /* Deeper saturated purple */
+            --button-primary-hover: #8a2be2; /* Lighter vibrant purple */
+            --button-secondary-bg: #22c55e; /* Green-500 */
+            --button-secondary-hover: #16a34a; /* Green-600 */
+            --blue-highlight-bg: #3a005a; /* Darker, more integrated highlight */
+            --blue-highlight-border: #a720e0; /* Vibrant highlight border */
+            --blue-highlight-text: #e0e7ff; /* Indigo-100 */
+            --error-bg: #ef4444; /* Red-500 */
+            --error-text: #fee2e2; /* Red-100 */
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --shadow-color-light: rgba(0, 0, 0, 0.3);
+            --gradient-start: #4d0080; /* Purple-800 */
+            --gradient-end: #8000ff; /* Violet-700 */
         }
 
         body {
@@ -69,7 +69,7 @@
             margin: 0;
             padding: 1rem;
             box-sizing: border-box;
-            transition: background-color 0.3s ease; /* Smooth theme transition */
+            transition: background-color 0.5s ease; /* Smooth theme transition */
         }
         .container {
             background-color: var(--container-bg);
@@ -80,9 +80,19 @@
             max-width: 500px;
             text-align: center;
             border: 1px solid var(--border-color);
-            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
             position: relative; /* For absolute positioning of theme toggle */
         }
+        h1, p, label, .result-area, .footer-time {
+            color: var(--text-color-primary);
+            transition: color 0.5s ease;
+        }
+        .text-gray-600 { color: var(--text-color-secondary); } /* Override tailwind default */
+        .text-gray-700 { color: var(--text-color-primary); } /* Override tailwind default */
+        .text-gray-800 { color: var(--text-color-primary); } /* Override tailwind default */
+        .text-gray-500 { color: var(--text-color-secondary); } /* Override tailwind default */
+
+
         input[type="text"], textarea, input[type="file"], button {
             border-radius: 0.75rem;
         }
@@ -95,19 +105,31 @@
         input[type="text"]:focus, textarea:focus, input[type="file"]:focus {
             border-color: var(--input-border-focus);
             outline: none;
-            box-shadow: 0 0 0 2px var(--input-border-focus);
+            box-shadow: 0 0 0 3px var(--input-border-focus), 0 0 15px var(--input-border-focus); /* Added glow */
         }
+        /* Placeholder styling */
+        input::placeholder, textarea::placeholder {
+            color: var(--text-color-secondary);
+            opacity: 0.7;
+        }
+        [data-theme='dark'] input::placeholder, [data-theme='dark'] textarea::placeholder {
+            color: var(--text-color-secondary);
+            opacity: 0.5;
+        }
+
         button {
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
             transform: translateY(0);
             background-image: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
             color: white;
             border: none;
+            font-weight: 700; /* Bold buttons */
+            padding: 0.75rem 1.5rem; /* More padding */
         }
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color-light);
-            opacity: 0.9;
+            transform: translateY(-3px); /* Slightly more lift */
+            box-shadow: 0 6px 12px -2px var(--shadow-color), 0 3px 6px -1px var(--shadow-color-light), 0 0 20px var(--input-border-focus); /* Enhanced glow on hover */
+            opacity: 1; /* Ensure full opacity */
         }
         .radio-group label, .input-type-selector label {
             display: flex;
@@ -116,37 +138,47 @@
             border-radius: 0.75rem;
             border: 2px solid var(--border-color);
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
             background-color: var(--input-bg);
             color: var(--text-color-primary);
+            font-weight: 500; /* Medium weight for labels */
         }
         .radio-group input[type="radio"]:checked + label, .input-type-selector input[type="radio"]:checked + label {
             border-color: var(--input-border-focus);
             background-color: var(--blue-highlight-bg);
             color: var(--blue-highlight-text);
+            box-shadow: 0 0 10px rgba(var(--input-border-focus-rgb, 167, 32, 224), 0.5); /* Subtle glow on checked */
         }
         .radio-group label:hover, .input-type-selector label:hover {
             background-color: var(--blue-highlight-bg);
-            opacity: 0.9;
+            opacity: 0.95;
+            box-shadow: 0 0 8px rgba(var(--input-border-focus-rgb, 167, 32, 224), 0.3);
         }
+        /* Extracting RGB for dynamic shadow */
+        [data-theme='dark'] { --input-border-focus-rgb: 167, 32, 224; }
+        :root { --input-border-focus-rgb: 74, 144, 226; } /* For light mode */
+
+
         .result-area {
             word-break: break-all;
             text-align: left;
             direction: ltr;
             overflow-x: auto;
-            /* max-height: 200px; */
             background-color: var(--input-bg);
             border: 1px solid var(--border-color);
             color: var(--text-color-primary);
+            padding: 1rem; /* More padding */
+            border-radius: 0.75rem; /* Consistent border radius */
         }
         #convertedContentDisplay {
             max-height: 6em; /* Approximately 4 lines of text (1.5em line-height * 4 lines) */
             overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
             white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
+            font-family: 'Vazirmatn', monospace; /* Use monospace for code-like content */
         }
         .text-gray-700 { color: var(--text-color-primary); }
         .text-gray-600 { color: var(--text-color-secondary); }
-        .text-indigo-600 { color: var(--input-border-focus); }
+        .text-indigo-600 { color: var(--input-border-focus); } /* For links */
         .text-green-600 { color: var(--button-secondary-hover); }
         .bg-gray-100 { background-color: var(--input-bg); }
         .border-gray-200 { border-color: var(--border-color); }
@@ -327,13 +359,13 @@
             </div>
             
             <div class="flex flex-col md:flex-row justify-center gap-4 mt-4">
-                <button id="copyLinkButton" class="bg-indigo-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2">
+                <button id="copyLinkButton" class="bg-indigo-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2">
                     کپی لینک
                 </button>
-                <button id="copyContentButton" class="bg-indigo-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2">
+                <button id="copyContentButton" class="bg-indigo-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2">
                     کپی محتوا
                 </button>
-                <button id="downloadButton" class="bg-green-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
+                <button id="downloadButton" class="bg-green-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
                     دانلود فایل
                 </button>
             </div>
