@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تبدیلگر Base64</title>
+    <!-- Favicon for Base64 operations (arrows symbolizing encode/decode) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%236366F1' d='M10 16.5V7.5L16 12L10 16.5ZM14 7.5L8 12L14 16.5V7.5Z'/%3E%3C/svg%3E">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Vazirmatn -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem; /* Add some padding for small screens */
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid #e2e8f0; /* Subtle border */
+        }
+        input[type="text"], textarea, input[type="file"], button {
+            border-radius: 0.75rem; /* Slightly more rounded inputs/buttons */
+        }
+        button {
+            transition: all 0.2s ease-in-out;
+            transform: translateY(0);
+        }
+        button:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .radio-group label, .input-type-selector label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: #f8fafc; /* Light background for radios */
+        }
+        .radio-group input[type="radio"]:checked + label, .input-type-selector input[type="radio"]:checked + label {
+            border-color: #6366f1; /* Indigo border for checked */
+            background-color: #e0e7ff; /* Lighter indigo background for checked */
+            color: #4338ca; /* Darker indigo text */
+        }
+        .radio-group label:hover, .input-type-selector label:hover {
+            background-color: #eff6ff; /* Lighter blue on hover */
+        }
+        .result-area {
+            word-break: break-all; /* Ensure long links break correctly */
+            text-align: left; /* Align text to the left for better readability of links */
+            direction: ltr; /* Force LTR for the link itself */
+            overflow-x: auto; /* Allow horizontal scrolling for long base64 strings */
+            max-height: 200px; /* Limit height for long results */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">تبدیلگر Base64</h1>
+        <p class="text-gray-600 mb-8">نوع ورودی و عملیات تبدیل را انتخاب کنید.</p>
+
+        <!-- Worker URL Configuration -->
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <label for="workerUrlInput" class="block text-blue-700 text-right text-sm font-medium mb-2">آدرس ورکر کلادفلر شما:</label>
+            <input type="text" id="workerUrlInput" placeholder="مثال: https://my-worker.yourusername.workers.dev"
+                   class="w-full px-4 py-3 border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-blue-700">
+            <button id="saveWorkerUrlButton"
+                    class="mt-3 bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                ذخیره آدرس ورکر
+            </button>
+            <div id="workerUrlMessage" class="text-green-600 text-sm mt-2 hidden">آدرس ورکر ذخیره شد!</div>
+        </div>
+
+        <!-- Input Type Selection -->
+        <div class="mb-6">
+            <label class="block text-gray-700 text-right text-sm font-medium mb-2">نوع ورودی:</label>
+            <div class="input-type-selector grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                    <input type="radio" id="inputTypeLink" name="inputType" value="link" class="hidden" checked>
+                    <label for="inputTypeLink" class="flex-grow justify-center">
+                        <span class="text-base">لینک</span>
+                    </label>
+                </div>
+                <div>
+                    <input type="radio" id="inputTypeText" name="inputType" value="text" class="hidden">
+                    <label for="inputTypeText" class="flex-grow justify-center">
+                        <span class="text-base">متن</span>
+                    </label>
+                </div>
+                <div>
+                    <input type="radio" id="inputTypeFile" name="inputType" value="file" class="hidden">
+                    <label for="inputTypeFile" class="flex-grow justify-center">
+                        <span class="text-base">فایل</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Fields (Dynamic) -->
+        <div id="inputContainer" class="mb-6">
+            <div id="linkInputContainer">
+                <label for="urlInput" class="block text-gray-700 text-right text-sm font-medium mb-2">لینک محتوا:</label>
+                <input type="text" id="urlInput" placeholder="مثال: https://github.com/user/repo/blob/main/file.txt"
+                       class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700">
+            </div>
+            <div id="textInputContainer" class="hidden">
+                <label for="textInput" class="block text-gray-700 text-right text-sm font-medium mb-2">متن مورد نظر:</label>
+                <textarea id="textInput" rows="6" placeholder="متن خود را اینجا وارد کنید..."
+                          class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"></textarea>
+            </div>
+            <div id="fileInputContainer" class="hidden">
+                <label for="fileInput" class="block text-gray-700 text-right text-sm font-medium mb-2">فایل مورد نظر:</label>
+                <input type="file" id="fileInput"
+                       class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+            </div>
+        </div>
+
+        <!-- Path Input Field -->
+        <div class="mb-6">
+            <label for="pathInput" class="block text-gray-700 text-right text-sm font-medium mb-2">مسیر دلخواه (مثال: my-content):</label>
+            <input type="text" id="pathInput" value="output"
+                   class="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
+                   placeholder="مثال: my-content یا subfolder/data">
+            <p class="text-xs text-gray-500 text-right mt-1">برای لینک‌ها، این مسیر در آدرس ورکر استفاده می‌شود. برای متن/فایل، نام فایل پیشنهادی برای دانلود است.</p>
+        </div>
+
+        <div class="mb-8 radio-group grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <input type="radio" id="decodeBase64" name="operation" value="decode" class="hidden" checked>
+                <label for="decodeBase64" class="flex-grow justify-center">
+                    <span class="ml-2 text-lg">خارج کردن از حالت Base64</span>
+                </label>
+            </div>
+            <div>
+                <input type="radio" id="encodeBase64" name="operation" value="encode" class="hidden">
+                <label for="encodeBase64" class="flex-grow justify-center">
+                    <span class="ml-2 text-lg">تبدیل به حالت Base64</span>
+                </label>
+            </div>
+        </div>
+
+        <button id="processButton"
+                class="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl text-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-md">
+            پردازش
+        </button>
+
+        <div id="loadingMessage" class="mt-4 text-indigo-600 hidden">
+            <p>در حال پردازش...</p>
+        </div>
+
+        <div id="resultArea" class="mt-8 p-4 bg-gray-100 border border-gray-200 rounded-xl hidden">
+            <p class="text-gray-700 text-right mb-2">لینک نتیجه / محتوای تبدیل شده:</p>
+            <a id="resultLink" href="#" target="_blank" class="result-area text-indigo-600 hover:underline"></a>
+            <div class="flex flex-col md:flex-row justify-center gap-4 mt-4">
+                <button id="copyButton" class="bg-indigo-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2">
+                    کپی لینک/نتیجه
+                </button>
+                <button id="downloadButton" class="bg-green-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
+                    دانلود فایل
+                </button>
+            </div>
+            <div id="copyMessage" class="text-green-600 text-sm mt-2 hidden">کپی شد!</div>
+        </div>
+
+        <div id="errorMessage" class="mt-8 p-4 bg-red-100 border border-red-200 rounded-xl text-red-700 hidden">
+            <p>خطا: <span id="errorText"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const WORKER_URL_KEY = 'cloudflare_base64_worker_url'; // Key for localStorage
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const workerUrlInput = document.getElementById('workerUrlInput');
+            const saveWorkerUrlButton = document.getElementById('saveWorkerUrlButton');
+            const workerUrlMessage = document.getElementById('workerUrlMessage');
+
+            const urlInput = document.getElementById('urlInput');
+            const textInput = document.getElementById('textInput');
+            const fileInput = document.getElementById('fileInput');
+            const pathInput = document.getElementById('pathInput'); 
+
+            const linkInputContainer = document.getElementById('linkInputContainer');
+            const textInputContainer = document.getElementById('textInputContainer');
+            const fileInputContainer = document.getElementById('fileInputContainer');
+            const inputTypeRadios = document.querySelectorAll('input[name="inputType"]');
+
+            const processButton = document.getElementById('processButton');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const resultArea = document.getElementById('resultArea');
+            const resultLink = document.getElementById('resultLink'); 
+            const copyButton = document.getElementById('copyButton');
+            const downloadButton = document.getElementById('downloadButton'); 
+            const copyMessage = document.getElementById('copyMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+
+            // Load worker URL from localStorage on page load
+            const savedWorkerUrl = localStorage.getItem(WORKER_URL_KEY);
+            if (savedWorkerUrl) {
+                workerUrlInput.value = savedWorkerUrl;
+            }
+
+            // Save worker URL to localStorage
+            saveWorkerUrlButton.addEventListener('click', () => {
+                const url = workerUrlInput.value.trim();
+                if (url) {
+                    localStorage.setItem(WORKER_URL_KEY, url);
+                    workerUrlMessage.classList.remove('hidden');
+                    setTimeout(() => workerUrlMessage.classList.add('hidden'), 2000);
+                } else {
+                    errorText.textContent = 'لطفاً آدرس ورکر را وارد کنید.';
+                    errorMessage.classList.remove('hidden');
+                }
+            });
+
+            // Function to show/hide input containers
+            function updateInputVisibility() {
+                const selectedType = document.querySelector('input[name="inputType"]:checked').value;
+                linkInputContainer.classList.add('hidden');
+                textInputContainer.classList.add('hidden');
+                fileInputContainer.classList.add('hidden');
+
+                if (selectedType === 'link') {
+                    linkInputContainer.classList.remove('hidden');
+                } else if (selectedType === 'text') {
+                    textInputContainer.classList.remove('hidden');
+                } else if (selectedType === 'file') {
+                    fileInputContainer.classList.remove('hidden');
+                }
+            }
+
+            // Add event listeners for input type radios
+            inputTypeRadios.forEach(radio => {
+                radio.addEventListener('change', updateInputVisibility);
+            });
+
+            // Initial visibility setup
+            updateInputVisibility();
+
+            processButton.addEventListener('click', async () => {
+                const workerBaseUrl = workerUrlInput.value.trim();
+                if (!workerBaseUrl) {
+                    errorText.textContent = 'لطفاً آدرس ورکر کلادفلر را وارد و ذخیره کنید.';
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+
+                const selectedOperation = document.querySelector('input[name="operation"]:checked').value;
+                const selectedInputType = document.querySelector('input[name="inputType"]:checked').value;
+                let userPath = pathInput.value.trim(); 
+
+                // Clear previous results/errors
+                resultArea.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+                copyMessage.classList.add('hidden');
+                loadingMessage.classList.remove('hidden'); 
+
+                let contentToProcess = '';
+                let isValidInput = true;
+                let mimeType = 'text/plain'; 
+                let finalDownloadFilename = userPath; 
+
+                if (selectedInputType === 'link') {
+                    contentToProcess = urlInput.value.trim();
+                    if (!contentToProcess) {
+                        errorText.textContent = 'لطفاً یک لینک معتبر وارد کنید.';
+                        isValidInput = false;
+                    }
+                    if (!userPath) { // Default path for links if not provided
+                        userPath = 'output'; // Default path for links
+                        pathInput.value = userPath; 
+                    }
+                    if (userPath.startsWith('/')) { // Remove leading slash for URL construction
+                        userPath = userPath.substring(1);
+                    }
+                    // For links, the download filename will be derived by the Worker
+                    finalDownloadFilename = userPath.split('/').pop(); 
+                } else if (selectedInputType === 'text') {
+                    contentToProcess = textInput.value;
+                    if (!contentToProcess) {
+                        errorText.textContent = 'لطفاً متنی را وارد کنید.';
+                        isValidInput = false;
+                    }
+                    if (!userPath) { // Default filename for text if not provided
+                        userPath = 'output.txt';
+                        pathInput.value = userPath; 
+                    }
+                    finalDownloadFilename = userPath;
+                } else if (selectedInputType === 'file') {
+                    const file = fileInput.files[0];
+                    if (!file) {
+                        errorText.textContent = 'لطفاً یک فایل را انتخاب کنید.';
+                        isValidInput = false;
+                    } else {
+                        mimeType = file.type || 'application/octet-stream';
+                        try {
+                            contentToProcess = await readFileAsArrayBuffer(file);
+                        } catch (err) {
+                            errorText.textContent = 'خطا در خواندن فایل: ' + err.message;
+                            isValidInput = false;
+                        }
+                        if (!userPath) { // Default filename for file if not provided
+                            userPath = file.name || 'output.bin';
+                            pathInput.value = userPath; 
+                        }
+                        finalDownloadFilename = userPath;
+                    }
+                }
+
+                if (!isValidInput) {
+                    errorMessage.classList.remove('hidden');
+                    loadingMessage.classList.add('hidden');
+                    return;
+                }
+
+                let displayContent = '';
+                let downloadHref = '#';
+                let isLinkOutput = false; 
+
+                try {
+                    // All processing is now done by the Worker
+                    let payload = {
+                        inputType: selectedInputType,
+                        content: selectedInputType === 'file' ? arrayBufferToBase64(contentToProcess) : contentToProcess,
+                        operation: selectedOperation,
+                        path: userPath, // Send path to worker for filename suggestion
+                        mimeType: mimeType // Send MIME type for file handling
+                    };
+
+                    const workerResponse = await fetch(workerBaseUrl, {
+                        method: 'POST', // Use POST to send potentially large content
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!workerResponse.ok) {
+                        const errorData = await workerResponse.text();
+                        throw new Error(`خطا از ورکر: ${workerResponse.status} - ${errorData}`);
+                    }
+
+                    const resultJson = await workerResponse.json();
+                    if (resultJson.url) {
+                        displayContent = resultJson.url; // The worker returns the URL to the processed content
+                        downloadHref = `${resultJson.url}&download=true`; // Add download flag for the download button
+                        isLinkOutput = true;
+                    } else if (resultJson.content) { // Worker might return content directly for text/file
+                        displayContent = resultJson.content;
+                        // For direct content, create a data URL for download
+                        downloadHref = `data:${resultJson.mimeType || 'application/octet-stream'};base64,${btoa(unescape(encodeURIComponent(resultJson.content)))}`;
+                        isLinkOutput = false;
+                    } else {
+                        throw new Error('پاسخ نامعتبر از ورکر.');
+                    }
+
+                    // Update result display
+                    resultLink.textContent = displayContent;
+                    resultLink.href = isLinkOutput ? displayContent : '#'; 
+                    resultLink.style.textDecoration = isLinkOutput ? 'underline' : 'none';
+                    resultLink.style.color = isLinkOutput ? 'rgb(79, 70, 229)' : 'inherit';
+                    
+                    // Update download button
+                    downloadButton.href = downloadHref;
+                    downloadButton.download = finalDownloadFilename; 
+
+                } catch (e) {
+                    errorText.textContent = 'خطا در عملیات: ' + e.message;
+                    errorMessage.classList.remove('hidden');
+                } finally {
+                    loadingMessage.classList.add('hidden'); 
+                    resultArea.classList.remove('hidden');
+                }
+            });
+
+            // Helper function to read file as ArrayBuffer (for binary safety)
+            function readFileAsArrayBuffer(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsArrayBuffer(file);
+                });
+            }
+
+            // Helper function to convert ArrayBuffer to Base64 string
+            function arrayBufferToBase64(buffer) {
+                let binary = '';
+                const bytes = new Uint8Array(buffer);
+                const len = bytes.byteLength;
+                for (let i = 0; i < len; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return btoa(binary);
+            }
+
+            copyButton.addEventListener('click', () => {
+                const textToCopy = resultLink.textContent; 
+                const tempInput = document.createElement('textarea');
+                tempInput.value = textToCopy;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                try {
+                    document.execCommand('copy');
+                    copyMessage.classList.remove('hidden');
+                    setTimeout(() => copyMessage.classList.add('hidden'), 2000); 
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    errorText.textContent = 'خطا در کپی کردن نتیجه.';
+                    errorMessage.classList.remove('hidden');
+                } finally {
+                    document.body.removeChild(tempInput);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
