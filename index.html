@@ -66,7 +66,13 @@
             text-align: left; /* Align text to the left for better readability of links */
             direction: ltr; /* Force LTR for the link itself */
             overflow-x: auto; /* Allow horizontal scrolling for long base64 strings */
-            max-height: 200px; /* Limit height for long results */
+            /* max-height: 200px; */ /* Removed as per user request for specific line height */
+        }
+        /* Specific styling for content display to limit lines and enable scroll */
+        #convertedContentDisplay {
+            max-height: 6em; /* Approximately 4 lines of text (1.5em line-height * 4 lines) */
+            overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
+            white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
         }
     </style>
 </head>
@@ -394,7 +400,7 @@
                         // For text/file, the worker returns the processed content directly
                         if (resultJson.content) {
                             displayedContent = resultJson.content;
-                            shareableLink = '#'; // No shareable link for direct content
+                            shareableLink = ''; // No shareable link for direct content, hide the link container
                             downloadHref = `data:${resultJson.mimeType || 'application/octet-stream'};base64,${btoa(unescape(encodeURIComponent(resultJson.content)))}`;
                         } else {
                             throw new Error('پاسخ نامعتبر از ورکر برای متن/فایل.');
@@ -402,12 +408,14 @@
                     }
 
                     // Update result display
-                    if (selectedInputType === 'link') {
+                    if (selectedInputType === 'link' && shareableLink) {
                         linkResultContainer.classList.remove('hidden');
                         resultLink.textContent = shareableLink;
                         resultLink.href = shareableLink;
                     } else {
                         linkResultContainer.classList.add('hidden');
+                        resultLink.textContent = ''; // Clear content if link not applicable
+                        resultLink.href = '#';
                     }
                     convertedContentDisplay.textContent = displayedContent;
                     
