@@ -11,73 +11,216 @@
     <!-- Google Fonts - Vazirmatn -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Base styles for light mode */
+        :root {
+            --bg-color: #f0f2f5;
+            --container-bg: #ffffff;
+            --text-color-primary: #1f2937; /* gray-900 */
+            --text-color-secondary: #4b5563; /* gray-600 */
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --input-border-focus: #6366f1; /* indigo-500 */
+            --button-primary-bg: #6366f1; /* indigo-600 */
+            --button-primary-hover: #4f46e5; /* indigo-700 */
+            --button-secondary-bg: #4ade80; /* green-400 */
+            --button-secondary-hover: #22c55e; /* green-500 */
+            --blue-highlight-bg: #e0e7ff; /* indigo-100 */
+            --blue-highlight-border: #818cf8; /* indigo-400 */
+            --blue-highlight-text: #3730a3; /* indigo-900 */
+            --error-bg: #fee2e2; /* red-100 */
+            --error-text: #ef4444; /* red-500 */
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-color-light: rgba(0, 0, 0, 0.06);
+            --gradient-start: #6366f1; /* indigo-600 */
+            --gradient-end: #8b5cf6; /* violet-500 */
+        }
+
+        /* Dark mode styles */
+        [data-theme='dark'] {
+            --bg-color: #1a202c; /* Dark blue-gray */
+            --container-bg: #2d3748; /* Darker blue-gray */
+            --text-color-primary: #e2e8f0; /* light gray */
+            --text-color-secondary: #a0aec0; /* gray-400 */
+            --border-color: #4a5568;
+            --input-bg: #4a5568;
+            --input-border-focus: #a78bfa; /* violet-400 */
+            --button-primary-bg: #7c3aed; /* violet-600 */
+            --button-primary-hover: #6d28d9; /* violet-700 */
+            --button-secondary-bg: #22c55e; /* green-500 */
+            --button-secondary-hover: #16a34a; /* green-600 */
+            --blue-highlight-bg: #4338ca; /* indigo-800 */
+            --blue-highlight-border: #6366f1; /* indigo-600 */
+            --blue-highlight-text: #e0e7ff; /* indigo-100 */
+            --error-bg: #ef4444; /* red-500 */
+            --error-text: #fee2e2; /* red-100 */
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --shadow-color-light: rgba(0, 0, 0, 0.2);
+            --gradient-start: #4c1d95; /* purple-800 */
+            --gradient-end: #6d28d9; /* violet-700 */
+        }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #f0f2f5; /* Light gray background */
+            background-color: var(--bg-color);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 1rem; /* Add some padding for small screens */
+            padding: 1rem;
             box-sizing: border-box;
+            transition: background-color 0.3s ease; /* Smooth theme transition */
         }
         .container {
-            background-color: #ffffff;
-            border-radius: 1.5rem; /* More rounded corners */
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+            background-color: var(--container-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color-light);
             padding: 2.5rem;
             width: 100%;
             max-width: 500px;
             text-align: center;
-            border: 1px solid #e2e8f0; /* Subtle border */
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative; /* For absolute positioning of theme toggle */
         }
         input[type="text"], textarea, input[type="file"], button {
-            border-radius: 0.75rem; /* Slightly more rounded inputs/buttons */
+            border-radius: 0.75rem;
+        }
+        input[type="text"], textarea, input[type="file"] {
+            background-color: var(--input-bg);
+            border-color: var(--border-color);
+            color: var(--text-color-primary);
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+        input[type="text"]:focus, textarea:focus, input[type="file"]:focus {
+            border-color: var(--input-border-focus);
+            outline: none;
+            box-shadow: 0 0 0 2px var(--input-border-focus);
         }
         button {
             transition: all 0.2s ease-in-out;
             transform: translateY(0);
+            background-image: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
         }
         button:hover {
-            transform: translateY(-2px); /* Slight lift on hover */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color-light);
+            opacity: 0.9;
         }
         .radio-group label, .input-type-selector label {
             display: flex;
             align-items: center;
             padding: 0.75rem 1rem;
             border-radius: 0.75rem;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            background-color: #f8fafc; /* Light background for radios */
+            background-color: var(--input-bg);
+            color: var(--text-color-primary);
         }
         .radio-group input[type="radio"]:checked + label, .input-type-selector input[type="radio"]:checked + label {
-            border-color: #6366f1; /* Indigo border for checked */
-            background-color: #e0e7ff; /* Lighter indigo background for checked */
-            color: #4338ca; /* Darker indigo text */
+            border-color: var(--input-border-focus);
+            background-color: var(--blue-highlight-bg);
+            color: var(--blue-highlight-text);
         }
         .radio-group label:hover, .input-type-selector label:hover {
-            background-color: #eff6ff; /* Lighter blue on hover */
+            background-color: var(--blue-highlight-bg);
+            opacity: 0.9;
         }
         .result-area {
-            word-break: break-all; /* Ensure long links break correctly */
-            text-align: left; /* Align text to the left for better readability of links */
-            direction: ltr; /* Force LTR for the link itself */
-            overflow-x: auto; /* Allow horizontal scrolling for long base64 strings */
-            /* max-height: 200px; */ /* Removed as per user request for specific line height */
+            word-break: break-all;
+            text-align: left;
+            direction: ltr;
+            overflow-x: auto;
+            /* max-height: 200px; */
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color-primary);
         }
-        /* Specific styling for content display to limit lines and enable scroll */
         #convertedContentDisplay {
             max-height: 6em; /* Approximately 4 lines of text (1.5em line-height * 4 lines) */
             overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
             white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
         }
+        .text-gray-700 { color: var(--text-color-primary); }
+        .text-gray-600 { color: var(--text-color-secondary); }
+        .text-indigo-600 { color: var(--input-border-focus); }
+        .text-green-600 { color: var(--button-secondary-hover); }
+        .bg-gray-100 { background-color: var(--input-bg); }
+        .border-gray-200 { border-color: var(--border-color); }
+        .bg-red-100 { background-color: var(--error-bg); }
+        .text-red-700 { color: var(--error-text); }
+        .bg-blue-50 { background-color: var(--blue-highlight-bg); }
+        .border-blue-200 { border-color: var(--blue-highlight-border); }
+        .text-blue-700 { color: var(--blue-highlight-text); }
+
+        /* Theme Toggle specific styles */
+        .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-color-secondary);
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .theme-toggle:hover {
+            color: var(--text-color-primary);
+        }
+        .theme-toggle input[type="checkbox"] {
+            display: none;
+        }
+        .theme-toggle .slider {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background-color: var(--border-color);
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+        .theme-toggle .slider:before {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .theme-toggle input:checked + .slider {
+            background-color: var(--button-primary-bg);
+        }
+        .theme-toggle input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Footer for Time Display */
+        .footer-time {
+            position: absolute;
+            bottom: 1rem;
+            right: 1.5rem;
+            font-size: 0.875rem; /* text-sm */
+            color: var(--text-color-secondary);
+            direction: ltr; /* Ensure time is LTR */
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Theme Toggle -->
+        <label class="theme-toggle">
+            <input type="checkbox" id="themeToggle">
+            <span class="slider"></span>
+            <span id="themeIcon">☀️</span> <!-- Sun/Moon emoji -->
+        </label>
+
         <h1 class="text-3xl font-bold text-gray-800 mb-6">تبدیلگر Base64</h1>
         <p class="text-gray-600 mb-8">نوع ورودی و عملیات تبدیل را انتخاب کنید.</p>
 
@@ -200,10 +343,14 @@
         <div id="errorMessage" class="mt-8 p-4 bg-red-100 border border-red-200 rounded-xl text-red-700 hidden">
             <p>خطا: <span id="errorText"></span></p>
         </div>
+
+        <!-- Tehran Time Display -->
+        <div id="tehranTime" class="footer-time"></div>
     </div>
 
     <script>
         const WORKER_URL_KEY = 'cloudflare_base64_worker_url'; // Key for localStorage
+        const THEME_KEY = 'app_theme'; // Key for theme preference
 
         document.addEventListener('DOMContentLoaded', () => {
             const workerUrlInput = document.getElementById('workerUrlInput');
@@ -224,24 +371,68 @@
             const loadingMessage = document.getElementById('loadingMessage');
             const resultArea = document.getElementById('resultArea');
             
-            const linkResultContainer = document.getElementById('linkResultContainer'); // New container for link
-            const resultLink = document.getElementById('resultLink'); // For the shareable URL
-            const convertedContentDisplay = document.getElementById('convertedContentDisplay'); // For the actual content
+            const linkResultContainer = document.getElementById('linkResultContainer'); 
+            const resultLink = document.getElementById('resultLink'); 
+            const convertedContentDisplay = document.getElementById('convertedContentDisplay'); 
 
-            const copyLinkButton = document.getElementById('copyLinkButton'); // New copy button for link
-            const copyContentButton = document.getElementById('copyContentButton'); // New copy button for content
+            const copyLinkButton = document.getElementById('copyLinkButton'); 
+            const copyContentButton = document.getElementById('copyContentButton'); 
             const downloadButton = document.getElementById('downloadButton'); 
             const copyMessage = document.getElementById('copyMessage');
             const errorMessage = document.getElementById('errorMessage');
             const errorText = document.getElementById('errorText');
 
-            // Load worker URL from localStorage on page load
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const tehranTimeDisplay = document.getElementById('tehranTime');
+
+            // --- Theme Management ---
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+                localStorage.setItem(THEME_KEY, theme);
+            }
+
+            // Check saved theme or system preference
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            if (savedTheme) {
+                themeToggle.checked = (savedTheme === 'dark');
+                applyTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                // Default to system preference if no saved theme
+                themeToggle.checked = true;
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+
+            themeToggle.addEventListener('change', () => {
+                applyTheme(themeToggle.checked ? 'dark' : 'light');
+            });
+
+            // --- Tehran Time Display ---
+            function updateTehranTime() {
+                const now = new Date();
+                const options = {
+                    timeZone: 'Asia/Tehran',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false // 24-hour format
+                };
+                const tehranTime = now.toLocaleTimeString('fa-IR', options); // Use fa-IR for Persian numerals if desired
+                tehranTimeDisplay.textContent = `تهران: ${tehranTime}`;
+            }
+            // Update time every second
+            setInterval(updateTehranTime, 1000);
+            updateTehranTime(); // Initial call
+
+            // --- Worker URL Management ---
             const savedWorkerUrl = localStorage.getItem(WORKER_URL_KEY);
             if (savedWorkerUrl) {
                 workerUrlInput.value = savedWorkerUrl;
             }
 
-            // Save worker URL to localStorage
             saveWorkerUrlButton.addEventListener('click', () => {
                 const url = workerUrlInput.value.trim();
                 if (url) {
@@ -254,7 +445,7 @@
                 }
             });
 
-            // Function to show/hide input containers
+            // --- Input Type Visibility ---
             function updateInputVisibility() {
                 const selectedType = document.querySelector('input[name="inputType"]:checked').value;
                 linkInputContainer.classList.add('hidden');
@@ -269,15 +460,12 @@
                     fileInputContainer.classList.remove('hidden');
                 }
             }
-
-            // Add event listeners for input type radios
             inputTypeRadios.forEach(radio => {
                 radio.addEventListener('change', updateInputVisibility);
             });
-
-            // Initial visibility setup
             updateInputVisibility();
 
+            // --- Processing Logic ---
             processButton.addEventListener('click', async () => {
                 const workerBaseUrl = workerUrlInput.value.trim();
                 if (!workerBaseUrl) {
@@ -290,7 +478,6 @@
                 const selectedInputType = document.querySelector('input[name="inputType"]:checked').value;
                 let userPath = pathInput.value.trim(); 
 
-                // Clear previous results/errors
                 resultArea.classList.add('hidden');
                 errorMessage.classList.add('hidden');
                 copyMessage.classList.add('hidden');
@@ -358,7 +545,6 @@
                 let downloadHref = '#';
 
                 try {
-                    // All processing is now done by the Worker
                     let payload = {
                         inputType: selectedInputType,
                         content: selectedInputType === 'file' ? arrayBufferToBase64(contentToProcess) : contentToProcess,
@@ -383,24 +569,21 @@
                     const resultJson = await workerResponse.json();
                     
                     if (selectedInputType === 'link') {
-                        // For links, the worker returns a URL to itself
                         if (resultJson.url) {
                             shareableLink = resultJson.url;
-                            // Now fetch the actual content from this shareable link to display it
                             const contentFetchResponse = await fetch(shareableLink);
                             if (!contentFetchResponse.ok) {
                                 throw new Error(`خطا در دریافت محتوا از لینک: ${contentFetchResponse.status} - ${await contentFetchResponse.text()}`);
                             }
                             displayedContent = await contentFetchResponse.text();
-                            downloadHref = `${shareableLink}&download=true`; // Add download flag for the download button
+                            downloadHref = `${shareableLink}&download=true`; 
                         } else {
                             throw new Error('پاسخ نامعتبر از ورکر برای لینک.');
                         }
-                    } else { // Text or File input
-                        // For text/file, the worker returns the processed content directly
+                    } else { 
                         if (resultJson.content) {
                             displayedContent = resultJson.content;
-                            shareableLink = ''; // No shareable link for direct content, hide the link container
+                            shareableLink = ''; 
                             downloadHref = `data:${resultJson.mimeType || 'application/octet-stream'};base64,${btoa(unescape(encodeURIComponent(resultJson.content)))}`;
                         } else {
                             throw new Error('پاسخ نامعتبر از ورکر برای متن/فایل.');
@@ -414,12 +597,11 @@
                         resultLink.href = shareableLink;
                     } else {
                         linkResultContainer.classList.add('hidden');
-                        resultLink.textContent = ''; // Clear content if link not applicable
+                        resultLink.textContent = ''; 
                         resultLink.href = '#';
                     }
                     convertedContentDisplay.textContent = displayedContent;
                     
-                    // Update download button
                     downloadButton.href = downloadHref;
                     downloadButton.download = finalDownloadFilename; 
 
@@ -432,7 +614,7 @@
                 }
             });
 
-            // Helper function to read file as ArrayBuffer (for binary safety)
+            // Helper functions
             function readFileAsArrayBuffer(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -442,7 +624,6 @@
                 });
             }
 
-            // Helper function to convert ArrayBuffer to Base64 string
             function arrayBufferToBase64(buffer) {
                 let binary = '';
                 const bytes = new Uint8Array(buffer);
